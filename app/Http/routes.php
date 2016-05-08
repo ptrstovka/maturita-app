@@ -1,0 +1,47 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Application Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register all of the routes for an application.
+| It's a breeze. Simply tell Laravel the URIs it should respond to
+| and give it the controller to call when that URI is requested.
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::auth();
+
+Route::get('/home', ['as' => 'home', 'uses' => 'HomeController@index']);
+
+Route::get('user/activate/{token}', ['as' => 'user.activate', 'uses' => 'UserController@activateAccount']);
+Route::post('user/create', ['as' => 'user.create', 'uses' => 'UserController@createUser']);
+
+Route::group(['middleware' => 'auth'], function() {
+	
+	Route::get('questions/all/{category}', ['as' => 'questions.all', 'uses' => 'QuestionController@indexAll']);
+	Route::get('questions/user/{category}', ['as' => 'questions.user', 'uses' => 'QuestionController@userQuestions']);
+	Route::get('question/{id}', ['as' => 'questions.show', 'uses' => 'QuestionController@showQuestion']);
+	Route::get('question/edit/{id}', ['as' => 'questions.edit', 'uses' => 'QuestionController@editQuestion']);
+	Route::post('question/edit/{id}', ['as' => 'questions.update', 'uses' => 'QuestionController@updateQuestion']);
+	
+	Route::get('users', ['as' => 'users.index', 'uses' => 'UserController@indexUsers']);
+	Route::get('user/{id}', ['as' => 'users.show', 'uses' => 'UserController@showUser']);
+	Route::post('user/update/{id}', ['as' => 'users.update', 'uses' => 'UserController@updateUser']);
+	
+});
+
+Route::get('test', function(){
+
+	$user = App\User::findOrFail(1);
+
+
+	return view('email.activation')
+		->withToken($user->token);
+
+});
