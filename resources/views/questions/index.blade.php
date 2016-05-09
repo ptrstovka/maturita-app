@@ -36,6 +36,7 @@
 								<th>Predmet</th>
 								<th data-sort-ignore="true">Znenie</th>
 								<th class="text-center">Stav</th>
+								<th class="text-center"><i class="fa fa-comment"></i></th>
 								<th class="text-center">Vypracoval</th>
 								<th data-sort-ignore="true" class="text-center">Akcia</th>
 							</tr>
@@ -50,6 +51,7 @@
 									<td>{{ $question->subject->slug }}</td>
 									<td><span data-toggle="tooltip" title="{{ $question->content }}">{{ $question->shortContent() }}</span></td>
 									<td class="text-center">{!! $question->getStatusAsLabel() !!}</td>
+									<td class="text-center" data-type="numeric" data-value="{{ count($question->comments) }}">{{ count($question->comments) }}</td>
 									<td class="text-center">{!! $question->getAssignedToName() !!}</td>
 									<td class="text-center vert-align">
 										<div class="btn-group">
