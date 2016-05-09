@@ -49,7 +49,7 @@
 									<td data-type="numeric" data-value="{{ $question->id }}"> {{ $question->id }}</td>
 									<td>{{ $question->subject->slug }}</td>
 									<td><span data-toggle="tooltip" title="{{ $question->content }}">{{ $question->shortContent() }}</span></td>
-									<td class="text-center">{!! $question->getStatusLabel() !!}</td>
+									<td class="text-center">{!! $question->getStatusAsLabel() !!}</td>
 									<td class="text-center">{!! $question->getAssignedToName() !!}</td>
 									<td class="text-center vert-align">
 										<div class="btn-group">

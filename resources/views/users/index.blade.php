@@ -18,11 +18,10 @@
 
 						<table class="footable table table-stripped" data-page-size="20" data-filter=#filter>
 
-
 							<thead>
 							<tr>
 								<th>#ID</th>
-								<th>Meno</th>
+								<th data-sort-ignore="true">Meno</th>
 								<th data-sort-ignore="true">Email</th>
 								<th class="text-center">Počet vypracovaní</th>
 								<th data-sort-ignore="true" class="text-center">Akcia</th>
@@ -32,19 +31,17 @@
 							<tbody>
 
 							@foreach($users as $user)
-
 								<tr>
 									<td data-type="numeric" data-value="{{ $user->id }}">{{ $user->id }}</td>
 									<td>{{ $user->fullName() }}</td>
 									<td>{{ $user->email }}</td>
-									<td class="text-center">{{ $user->solved_questions }}</td>
+									<td data-type="numeric" data-value="{{ $user->solved_questions }}" class="text-center">{{ $user->solved_questions }}</td>
 									<td class="text-center vert-align">
 										<div class="btn-group">
 											<a href="{{ route('users.show', $user->id) }}" class="btn btn-xs btn-default">editovať</a>
 										</div>
 									</td>
 								</tr>
-
 							@endforeach
 
 							</tbody>

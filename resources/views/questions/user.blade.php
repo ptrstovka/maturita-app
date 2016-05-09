@@ -56,7 +56,11 @@
 										<td class="text-center">{!! $question->getStatusLabel() !!}</td>
 										<td class="text-center vert-align">
 											<div class="btn-group">
+												@if($question->status != 2)
 												<a href="{{ $question->getEditUrl() }}" class="btn btn-xs btn-default">vypracovať</a>
+												@else
+													<a href="{{ $question->getUrl() }}" class="btn btn-xs btn-default">zobraziť</a>
+												@endif
 											</div>
 										</td>
 									</tr>

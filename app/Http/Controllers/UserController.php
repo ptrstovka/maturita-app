@@ -20,12 +20,13 @@ class UserController extends Controller
 
 		$user = User::where('token', $token)->first();
 
-		if($user == null) {
+		if ($user == null) {
 			return Redirect::to('login')->withErrors(['Aktivačný link je neplatný.']);
 		}
 
-		if($user->is_activated) {
+		if ($user->is_activated) {
 			Session::flash('info', 'Tvoj účet už je aktivovaný.');
+
 			return Redirect::to('login');
 		}
 
@@ -35,9 +36,10 @@ class UserController extends Controller
 
 		$questions = Question::where('assigned_to', 0)->where('category_id', 1)->get();
 
-		for($i = 0; $i < 8; $i++) {
-			$num = random_int(0, count($questions) -1);
+		for ($i = 0; $i < 8; $i++) {
+			$num                          = random_int(0, count($questions) - 1);
 			$questions[$num]->assigned_to = $user->id;
+			$questions[$num]->status      = 1;
 			$questions[$num]->save();
 		}
 
@@ -59,8 +61,10 @@ class UserController extends Controller
 			'password'   => 'required|min:8|confirmed',
 		]);
 
-		if(!ends_with($data['email'], '@spse-po.sk')) {
-			return back()->withErrors(['Musíš použiť školsku emailovú adresu.'])->withInput();
+		if (env('REQUIRE_VALID_MAIL', true)) {
+			if (!ends_with($data['email'], '@spse-po.sk')) {
+				return back()->withErrors(['Musíš použiť školsku emailovú adresu.'])->withInput();
+			}
 		}
 
 		if ($validator->fails()) {
@@ -78,13 +82,14 @@ class UserController extends Controller
 
 		// add first category
 		$user->categories()->sync([1]);
-		
-		$user->sendActivationEmail();
+
+		if (env('SEND_EMAILS', true)) {
+			$user->sendActivationEmail();
+		}
 
 		Session::flash('message', 'Tvoj účet bol úspešne vytvorený. 
 		Avšak aby sme zachovali všetko v tajnosti, musím overiť, či zadaná emailová adresa fakt patrí tebe. 
 		Skontroluj si svoju poštu. Bol ti zaslaný aktivačný link.');
-
 
 
 		//return back();
@@ -103,34 +108,37 @@ class UserController extends Controller
 			'password_confirmation'
 		]);
 	}
-	
-	public function indexUsers() {
 
-		if(!Auth::user()->isAdmin()) {
+	public function indexUsers()
+	{
+
+		if (!Auth::user()->isAdmin()) {
 			return abort(404);
 		}
 
 		return view('users.index')
 			->withUsers(User::all());
 	}
-	
-	public function showUser($id) {
 
-		if(!Auth::user()->isAdmin()) {
+	public function showUser($id)
+	{
+
+		if (!Auth::user()->isAdmin()) {
 			return abort(404);
 		}
-		
-		$user = User::findOrFail($id);
+
+		$user       = User::findOrFail($id);
 		$categories = Category::all();
-		
+
 		return view('users.show')
 			->withUser($user)
 			->withCategories($categories);
 	}
 
-	public function updateUser(Request $request, $id) {
+	public function updateUser(Request $request, $id)
+	{
 
-		if(!Auth::user()->isAdmin()) {
+		if (!Auth::user()->isAdmin()) {
 			return abort(404);
 		}
 
@@ -140,22 +148,23 @@ class UserController extends Controller
 
 		$validator = Validator::make($data, [
 			'first_name' => 'required',
-			'last_name' => 'required',
+			'last_name'  => 'required',
 		]);
 
-		if($validator->fails()) {
+		if ($validator->fails()) {
 			return back()->withErrors($validator->errors());
 		}
 
 		$categories = $request->get('categories');
 		$user->categories()->sync($categories);
 		$user->first_name = $data['first_name'];
-		$user->last_name = $data['last_name'];
+		$user->last_name  = $data['last_name'];
 		$user->save();
 
-		
+
 		Session::flash('message', 'Užívateľ bol aktualizovaný.');
+
 		return back();
 	}
-	
+
 }
