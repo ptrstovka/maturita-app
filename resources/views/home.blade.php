@@ -38,7 +38,7 @@
 						</ul>
 						<hr>
 
-						Made with <i class="fa fa-heart-o"></i> by Petrík. <strong>v1.2.1</strong>
+						Made with <i class="fa fa-heart-o"></i> by Petrík. <strong>v1.2.2</strong>
 
 					</div>
 				</div>
