@@ -52,6 +52,10 @@ class UserController extends Controller
 	public function createUser(Request $request)
 	{
 
+		if(env('DISABLE_REGISTRATIONS', true)) {
+			return back()->withErrors(['Registrácie sú zastavené.']);
+		}
+
 		$data = $this->getUserCreateFields($request);
 
 		$validator = Validator::make($data, [
