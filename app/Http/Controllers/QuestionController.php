@@ -161,12 +161,13 @@ class QuestionController extends Controller
 			// update existing answer
 			$question->answer->content = $final_content;
 			$question->status = 2;
+			$question->answer->user_id = Auth::user()->id;
 			$question->answer->save();
 
-			if ($question->user != null) {
-				$question->assigned_to = Auth::user()->id;
-				$question->save();
-			}
+			//if ($question->user != null) {
+			//	$question->assigned_to = Auth::user()->id;
+			//	$question->save();
+			//}
 
 		}
 
