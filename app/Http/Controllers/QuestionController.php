@@ -66,8 +66,45 @@ class QuestionController extends Controller
 			return abort(404);
 		}
 
+		$questions = Question::all();
+		$next = 0;
+		$prev = 0;
+
+		// first ID will be passed if questions array is not empty
+		if(count($questions) > 0) {
+			$next = $questions[0]->id;
+		}
+
+		// last ID will be passed
+		for($l = count($questions) - 1; $l > 0; $l--){
+			if(Auth::user()->hasCategory($questions[$l]->category_id)){
+				$prev = $questions[$l]->id;
+				break;
+			}
+		}
+
+		for ($i = 0; $i < count($questions); $i++) {
+
+			$q = $questions[$i];
+			if($q->id == $question->id) {
+				if(($i + 1) < count($questions)) {
+					if(Auth::user()->hasCategory($questions[$i + 1]->category_id)){
+						$next = $questions[$i + 1]->id;
+					}
+				}
+
+				if(($i - 1) > -1) {
+					if(Auth::user()->hasCategory($questions[$i - 1]->category_id)) {
+						$prev = $questions[$i - 1]->id;
+					}
+				}
+			}
+		}
+		
 		return view('questions.show')
-			->withQuestion($question);
+			->withQuestion($question)
+			->withNext($next)
+			->withPrev($prev);
 	}
 
 	public function editQuestion($id)
@@ -160,7 +197,7 @@ class QuestionController extends Controller
 		} else {
 			// update existing answer
 			$question->answer->content = $final_content;
-			$question->status = 2;
+			$question->status          = 2;
 			$question->answer->user_id = Auth::user()->id;
 			$question->answer->save();
 
@@ -176,9 +213,10 @@ class QuestionController extends Controller
 		return Redirect::route('questions.show', $id);
 	}
 
-	public function updateQuestionStatus($id, $status) {
+	public function updateQuestionStatus($id, $status)
+	{
 
-		if(!Auth::user()->isAdmin()){
+		if (!Auth::user()->isAdmin()) {
 			return abort(404);
 		}
 
@@ -187,6 +225,7 @@ class QuestionController extends Controller
 		$question->status = $status;
 		$question->save();
 		Session::flash('message', 'Status bol zmenený.');
+
 		return back();
 	}
 
@@ -262,17 +301,19 @@ class QuestionController extends Controller
 		return back();
 	}
 
-	public function deleteComment($id) {
-		
-		if(!Auth::user()->isAdmin()) {
+	public function deleteComment($id)
+	{
+
+		if (!Auth::user()->isAdmin()) {
 			return abort(404);
 		}
-		
+
 		$comment = Comment::findOrFail($id);
 		$comment->delete();
 
 		Session::flash('message', 'Komentár bol zmazaný.');
+
 		return back();
 	}
-	
+
 }

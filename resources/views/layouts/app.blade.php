@@ -93,7 +93,7 @@
 
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-							{{ Auth::user()->fullName() }} <span class="caret"></span>
+							{{ Auth::user()->fullName() }} @if(Auth::user()->isAdmin()) - Administrator @endif<span class="caret"></span>
 						</a>
 
 						<ul class="dropdown-menu" role="menu">

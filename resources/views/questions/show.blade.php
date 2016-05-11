@@ -10,7 +10,19 @@
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1">
 				<div class="panel panel-default">
-					<div class="panel-heading">Otázka #{{ $question->id }}</div>
+					<div class="panel-heading">
+						<span>Otázka #{{ $question->id }}</span>
+						@if(Auth::user()->isVerified())
+							@if($next != 0)
+								<a href="{{ route('questions.show', $next) }}"
+								   class="btn btn-default btn-xs pull-right">ďalšia</a>
+							@endif
+							@if($prev != 0)
+								<a href="{{ route('questions.show', $prev) }}"
+								   class="btn btn-default btn-xs pull-right">predchádzajúca</a>
+							@endif
+						@endif
+					</div>
 
 					<div class="panel-body">
 
@@ -53,10 +65,10 @@
 								@endif
 								{{-- TODO there would be a problem with admin permissions...--}}
 								{{--@if($question->assigned_to == Auth::user()->id)--}}
-									{{--<hr>--}}
-									{{--<div class="btn-group">--}}
-										{{--<a href="#" class="btn btn-xs btn-default">označiť, že na tom pracujem</a>--}}
-									{{--</div>--}}
+								{{--<hr>--}}
+								{{--<div class="btn-group">--}}
+								{{--<a href="#" class="btn btn-xs btn-default">označiť, že na tom pracujem</a>--}}
+								{{--</div>--}}
 								{{--@endif--}}
 							</div>
 
@@ -77,7 +89,8 @@
 				<div class="comment-tabs">
 					<ul class="nav nav-tabs" role="tablist">
 						<li class="active"><a href="#comments-logout" role="tab" data-toggle="tab"><h4
-										class="reviews text-capitalize">Komentáre ({{ count($question->comments) }})</h4></a></li>
+										class="reviews text-capitalize">Komentáre ({{ count($question->comments) }}
+									)</h4></a></li>
 						<li><a href="#add-comment" role="tab" data-toggle="tab"><h4 class="reviews text-capitalize">
 									Pridať komentár</h4></a></li>
 					</ul>
@@ -86,7 +99,7 @@
 							<ul class="media-list">
 
 								@if(count($question->comments) > 0)
-								@foreach($question->comments as $comment)
+									@foreach($question->comments as $comment)
 										<li class="media">
 											<a class="pull-left" href="#">
 												<img class="media-object img-circle"
@@ -105,13 +118,15 @@
 													</p>
 
 													@if(Auth::user()->isAdmin())
-														<a class="btn btn-danger btn-xs" href="{{ route('questions.comment.delete', $comment->id) }}" id="reply"><span class="fa fa-remove"></span> zmazať</a>
+														<a class="btn btn-danger btn-xs"
+														   href="{{ route('questions.comment.delete', $comment->id) }}"
+														   id="reply"><span class="fa fa-remove"></span> zmazať</a>
 													@endif
 
 												</div>
 											</div>
 										</li>
-								@endforeach
+									@endforeach
 								@else
 									<p>Žiadne komentáre.</p>
 								@endif
@@ -165,7 +180,7 @@
 
 	<script>
 
-		$(document).ready(function() {
+		$(document).ready(function () {
 			$('#comment').summernote({
 				minHeight: 200
 			});

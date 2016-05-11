@@ -38,13 +38,3 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::post('user/update/{id}', ['as' => 'users.update', 'uses' => 'UserController@updateUser']);
 	
 });
-
-Route::get('test', function(){
-
-	$user = App\User::findOrFail(1);
-
-
-	return view('email.activation')
-		->withToken($user->token);
-
-});
