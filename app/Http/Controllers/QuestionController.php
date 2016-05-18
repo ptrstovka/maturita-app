@@ -72,17 +72,17 @@ class QuestionController extends Controller
 		}
 
 		$questions = Question::all();
-		$next = 0;
-		$prev = 0;
+		$next      = 0;
+		$prev      = 0;
 
 		// first ID will be passed if questions array is not empty
-		if(count($questions) > 0) {
+		if (count($questions) > 0) {
 			$next = $questions[0]->id;
 		}
 
 		// last ID will be passed
-		for($l = count($questions) - 1; $l > 0; $l--){
-			if(Auth::user()->hasCategory($questions[$l]->category_id)){
+		for ($l = count($questions) - 1; $l > 0; $l--) {
+			if (Auth::user()->hasCategory($questions[$l]->category_id)) {
 				$prev = $questions[$l]->id;
 				break;
 			}
@@ -91,21 +91,21 @@ class QuestionController extends Controller
 		for ($i = 0; $i < count($questions); $i++) {
 
 			$q = $questions[$i];
-			if($q->id == $question->id) {
-				if(($i + 1) < count($questions)) {
-					if(Auth::user()->hasCategory($questions[$i + 1]->category_id)){
+			if ($q->id == $question->id) {
+				if (($i + 1) < count($questions)) {
+					if (Auth::user()->hasCategory($questions[$i + 1]->category_id)) {
 						$next = $questions[$i + 1]->id;
 					}
 				}
 
-				if(($i - 1) > -1) {
-					if(Auth::user()->hasCategory($questions[$i - 1]->category_id)) {
+				if (($i - 1) > -1) {
+					if (Auth::user()->hasCategory($questions[$i - 1]->category_id)) {
 						$prev = $questions[$i - 1]->id;
 					}
 				}
 			}
 		}
-		
+
 		return view('questions.show')
 			->withQuestion($question)
 			->withNext($next)
@@ -134,7 +134,7 @@ class QuestionController extends Controller
 
 		$question = Question::findOrFail($id);
 
-		if(Auth::user()->isAdmin()) {
+		if (Auth::user()->isAdmin()) {
 			// TODO: make validation
 			// but admin should have brain...
 			$question->content = $request->get('content');
@@ -143,48 +143,51 @@ class QuestionController extends Controller
 
 		$answer_content = $request->get('answer');
 
-		try {
+		$final_content = $answer_content;
 
-			$dom = new DomDocument();
-			$dom->loadHtml(mb_convert_encoding($answer_content, 'HTML-ENTITIES', "UTF-8"),
-				LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		if (env('ENABLE_IMAGE_UPLOADS', false)) {
+			try {
+				$dom = new DomDocument();
+				$dom->loadHtml(mb_convert_encoding($answer_content, 'HTML-ENTITIES', "UTF-8"),
+					LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-			$images = $dom->getElementsByTagName('img');
+				$images = $dom->getElementsByTagName('img');
 
-			// foreach <img> in the submited message
-			foreach ($images as $img) {
-				$src = $img->getAttribute('src');
+				// foreach <img> in the submited message
+				foreach ($images as $img) {
+					$src = $img->getAttribute('src');
 
-				// if the img source is 'data-url'
-				if (preg_match('/data:image/', $src)) {
+					// if the img source is 'data-url'
+					if (preg_match('/data:image/', $src)) {
 
-					// get the mimetype
-					preg_match('/data:image\/(?<mime>.*?)\;/', $src, $groups);
-					$mimetype = $groups['mime'];
+						// get the mimetype
+						preg_match('/data:image\/(?<mime>.*?)\;/', $src, $groups);
+						$mimetype = $groups['mime'];
 
-					// Generating a random filename
-					$filename = uniqid();
-					$filepath = "images/$filename.$mimetype";
+						// Generating a random filename
+						$filename = uniqid();
+						$filepath = "images/$filename.$mimetype";
 
-					// @see http://image.intervention.io/api/
-					$image = Image::make($src)
-						// resize if required
-						/* ->resize(300, 200) */
-						->encode($mimetype, 100)// encode file to the specified mimetype
-						->save(public_path($filepath));
+						// @see http://image.intervention.io/api/
+						$image = Image::make($src)
+							// resize if required
+							/* ->resize(300, 200) */
+							->encode($mimetype, 100)// encode file to the specified mimetype
+							->save(public_path($filepath));
 
-					$new_src = asset($filepath);
-					$img->removeAttribute('src');
-					$img->setAttribute('src', $new_src);
-				} // <!--endif
-			} // <!--endforeach
+						$new_src = asset($filepath);
+						$img->removeAttribute('src');
+						$img->setAttribute('src', $new_src);
+					} // <!--endif
+				} // <!--endforeach
 
-			$final_content = $dom->saveHTML();
+				$final_content = $dom->saveHTML();
 
-		} catch (Exception $e) {
-			Session::flash('warning', 'Skús nekopírovať a otázku vypracovať sám.');
+			} catch (Exception $e) {
+				Session::flash('warning', 'Skús nekopírovať a otázku vypracovať sám.');
 
-			return back()->withInput();
+				return back()->withInput();
+			}
 		}
 
 		if ($question->answer == null) {
@@ -329,9 +332,10 @@ class QuestionController extends Controller
 	}
 
 	// TODO boilerplate code
-	public function updateSubcontent(Request $request, $id) {
+	public function updateSubcontent(Request $request, $id)
+	{
 
-		if(!Auth::user()->isAdmin()){
+		if (!Auth::user()->isAdmin()) {
 			return abort(404);
 		}
 
@@ -339,66 +343,75 @@ class QuestionController extends Controller
 
 		$sub_content = $request->get('subcontent');
 
-		if($sub_content == "<p><br></p>") {
+
+		if ($sub_content == "<p><br></p>") {
 			// delete content
 			$question->subcontent = "";
 			$question->save();
 			Session::flash('message', 'Subcontent deleted.');
+
 			return Redirect::route('questions.show', $id);
 		}
 
-		try {
+		$final_content = $sub_content;
 
-			$dom = new DomDocument();
-			$dom->loadHtml(mb_convert_encoding($sub_content, 'HTML-ENTITIES', "UTF-8"),
-				LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		if (env('ENABLE_IMAGE_UPLOADS', false)) {
+			try {
 
-			$images = $dom->getElementsByTagName('img');
+				$dom = new DomDocument();
+				$dom->loadHtml(mb_convert_encoding($sub_content, 'HTML-ENTITIES', "UTF-8"),
+					LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-			// foreach <img> in the submited message
-			foreach ($images as $img) {
-				$src = $img->getAttribute('src');
+				$images = $dom->getElementsByTagName('img');
 
-				// if the img source is 'data-url'
-				if (preg_match('/data:image/', $src)) {
+				// foreach <img> in the submited message
+				foreach ($images as $img) {
+					$src = $img->getAttribute('src');
 
-					// get the mimetype
-					preg_match('/data:image\/(?<mime>.*?)\;/', $src, $groups);
-					$mimetype = $groups['mime'];
+					// if the img source is 'data-url'
+					if (preg_match('/data:image/', $src)) {
 
-					// Generating a random filename
-					$filename = uniqid();
-					$filepath = "images/$filename.$mimetype";
+						// get the mimetype
+						preg_match('/data:image\/(?<mime>.*?)\;/', $src, $groups);
+						$mimetype = $groups['mime'];
 
-					// @see http://image.intervention.io/api/
-					$image = Image::make($src)
-						// resize if required
-						/* ->resize(300, 200) */
-						->encode($mimetype, 100)// encode file to the specified mimetype
-						->save(public_path($filepath));
+						// Generating a random filename
+						$filename = uniqid();
+						$filepath = "images/$filename.$mimetype";
 
-					$new_src = asset($filepath);
-					$img->removeAttribute('src');
-					$img->setAttribute('src', $new_src);
-				} // <!--endif
-			} // <!--endforeach
+						// @see http://image.intervention.io/api/
+						$image = Image::make($src)
+							// resize if required
+							/* ->resize(300, 200) */
+							->encode($mimetype, 100)// encode file to the specified mimetype
+							->save(public_path($filepath));
 
-			$final_content = $dom->saveHTML();
+						$new_src = asset($filepath);
+						$img->removeAttribute('src');
+						$img->setAttribute('src', $new_src);
+					} // <!--endif
+				} // <!--endforeach
 
-		} catch (Exception $e) {
-			Session::flash('warning', 'Neplatný HTML kód.');
-			return back()->withInput();
+				$final_content = $dom->saveHTML();
+
+			} catch (Exception $e) {
+				Session::flash('warning', 'Neplatný HTML kód.');
+
+				return back()->withInput();
+			}
 		}
 
 		$question->subcontent = $final_content;
 		$question->save();
 
 		Session::flash('message', 'Subcontent added.');
+
 		return Redirect::route('questions.show', $id);
 	}
 
-	public function editSubcontent($id) {
-		if(!Auth::user()->isAdmin()){
+	public function editSubcontent($id)
+	{
+		if (!Auth::user()->isAdmin()) {
 			return abort(404);
 		}
 
