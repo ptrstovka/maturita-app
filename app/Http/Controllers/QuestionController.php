@@ -117,6 +117,10 @@ class QuestionController extends Controller
 
 		$question = Question::findOrFail($id);
 
+		if(env('DISABLE_EDIT', true) && !Auth::user()->isAdmin()) {
+			return abort(404);
+		}
+
 		if (!Auth::user()->hasCategory($question->category_id)) {
 			return abort(404);
 		}
@@ -131,6 +135,9 @@ class QuestionController extends Controller
 
 	public function updateQuestion(Request $request, $id)
 	{
+		if(env('DISABLE_EDIT', true) && !Auth::user()->isAdmin()) {
+			return abort(404);
+		}
 
 		$question = Question::findOrFail($id);
 

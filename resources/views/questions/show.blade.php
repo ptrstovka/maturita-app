@@ -62,8 +62,10 @@
 
 						@if($question->isSolved())
 							<div class="form-group">
+								@if(!env('DISABLE_EDIT', true) || Auth::user()->isAdmin())
 								<a class="btn btn-xs btn-warning" href="{{ $question->getEditUrl() }}">upraviť
 									odpoveď</a>
+								@endif
 								@if(Auth::user()->isVerified())
 									<a class="btn btn-xs btn-default"
 									   href="{{ route('questions.all', $question->category_id) }}">späť všetky
