@@ -17,7 +17,7 @@
 									Kamilovi...
 									a nebudem ďalej menovať lebo určite ešte niekoho zabudnem a ukrivdím mu. Vy ste toho
 									spravili najviac.
-									Spolužiaci by sa vás mali pozvať na pivo ;)</p>
+									Spolužiaci by vás mali pozvať na pivo ;)</p>
 							</div>
 
 							<div class="col-sm-6 col-sm-offset-3">
