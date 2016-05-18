@@ -31,14 +31,8 @@
 						Ak by sa našiel niekto kto by chcel prispieť do tohto systému - nech sa páči <a
 								href="https://github.com/ptrstovka/maturita-app"><i class="fa fa-github"></i> GitHub</a>
 						<br>
-						Čo tu ešte plánujem pridať?
-						<ul>
-							<li>export vypracovaných otázok do PDF pre tlač alebo ak sa chceš učiť aj na hajzli u babky</li>
-							<li>nejaké štatistiky, kto spravil najviac, kto najmenej, kto vôbec (nech vieme aké hovädá máme v triede)</li>
-						</ul>
-						<hr>
 
-						Made with <i class="fa fa-heart-o"></i> by Petrík. <strong>v1.2.2</strong>
+						Made with <i class="fa fa-heart-o"></i> by Petrík. <strong>v1.3</strong>
 
 					</div>
 				</div>

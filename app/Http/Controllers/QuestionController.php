@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
 
+/**
+ * TODO: Yep, this class has boilerplate code but I don't have time because I must learn for graduation.
+ * TODO: If someone can't look at this code, make pull request :P
+ * Also.. this app should help me with graduation :)
+ */
 class QuestionController extends Controller
 {
 	public function indexAll($category)
@@ -128,6 +133,13 @@ class QuestionController extends Controller
 	{
 
 		$question = Question::findOrFail($id);
+
+		if(Auth::user()->isAdmin()) {
+			// TODO: make validation
+			// but admin should have brain...
+			$question->content = $request->get('content');
+			$question->save();
+		}
 
 		$answer_content = $request->get('answer');
 
@@ -314,6 +326,84 @@ class QuestionController extends Controller
 		Session::flash('message', 'Komentár bol zmazaný.');
 
 		return back();
+	}
+
+	// TODO boilerplate code
+	public function updateSubcontent(Request $request, $id) {
+
+		if(!Auth::user()->isAdmin()){
+			return abort(404);
+		}
+
+		$question = Question::findOrFail($id);
+
+		$sub_content = $request->get('subcontent');
+
+		if($sub_content == "<p><br></p>") {
+			// delete content
+			$question->subcontent = "";
+			$question->save();
+			Session::flash('message', 'Subcontent deleted.');
+			return Redirect::route('questions.show', $id);
+		}
+
+		try {
+
+			$dom = new DomDocument();
+			$dom->loadHtml(mb_convert_encoding($sub_content, 'HTML-ENTITIES', "UTF-8"),
+				LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+			$images = $dom->getElementsByTagName('img');
+
+			// foreach <img> in the submited message
+			foreach ($images as $img) {
+				$src = $img->getAttribute('src');
+
+				// if the img source is 'data-url'
+				if (preg_match('/data:image/', $src)) {
+
+					// get the mimetype
+					preg_match('/data:image\/(?<mime>.*?)\;/', $src, $groups);
+					$mimetype = $groups['mime'];
+
+					// Generating a random filename
+					$filename = uniqid();
+					$filepath = "images/$filename.$mimetype";
+
+					// @see http://image.intervention.io/api/
+					$image = Image::make($src)
+						// resize if required
+						/* ->resize(300, 200) */
+						->encode($mimetype, 100)// encode file to the specified mimetype
+						->save(public_path($filepath));
+
+					$new_src = asset($filepath);
+					$img->removeAttribute('src');
+					$img->setAttribute('src', $new_src);
+				} // <!--endif
+			} // <!--endforeach
+
+			$final_content = $dom->saveHTML();
+
+		} catch (Exception $e) {
+			Session::flash('warning', 'Neplatný HTML kód.');
+			return back()->withInput();
+		}
+
+		$question->subcontent = $final_content;
+		$question->save();
+
+		Session::flash('message', 'Subcontent added.');
+		return Redirect::route('questions.show', $id);
+	}
+
+	public function editSubcontent($id) {
+		if(!Auth::user()->isAdmin()){
+			return abort(404);
+		}
+
+		return view('questions.subedit')
+			->withQuestion(Question::findOrFail($id));
 	}
 
 }

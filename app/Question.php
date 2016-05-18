@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Question extends Model
 {
-	protected $fillable = ['content', 'answer_id', 'assigned_to', 'subject_id', 'status'];
+	protected $fillable = ['content', 'answer_id', 'assigned_to', 'subject_id', 'status', 'subcontent'];
 
 	public function subject()
 	{
@@ -43,6 +43,10 @@ class Question extends Model
 
 		return '<span class="label label-danger">NEVYPRACOVANÁ</span>';
 
+	}
+	
+	public function hasSubcontent(){
+		return $this->subcontent != null || $this->subcontent != "";
 	}
 
 	public function getStatusAsLabel() {

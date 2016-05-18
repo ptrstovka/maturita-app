@@ -10,31 +10,20 @@
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1">
 				<div class="panel panel-default">
-					<div class="panel-heading">Úprava otázky #{{ $question->id }}</div>
+					<div class="panel-heading">Subcontent for question #{{ $question->id }}</div>
 
 					<div class="panel-body">
 
-						{!! Form::open(['route' => ['questions.update', $question->id], 'method' => 'post']) !!}
+						{!! Form::open(['route' => ['questions.update.subcontent', $question->id], 'method' => 'post']) !!}
 
-						@if(Auth::user()->isAdmin())
 
-						{{-- Question Field --}}
-						<div class="form-group">
-							<div class="form-group">
-								{!! Form::text('content', $question->content, [
-									'class' => 'form-control'
-								]) !!}
-							</div>
-						</div>
+						<strong>{{ $question->content }}</strong>
 
-						@else
-							<strong>{{ $question->content }}</strong>
-						@endif
 
 
 						{{--  Field --}}
 						<div class="form-group">
-						    {!! Form::textarea('answer', $question->answer != null ? $question->answer->content : null, [
+						    {!! Form::textarea('subcontent', $question->subcontent, [
 						        'class' => 'form-control',
 						        'id' => 'answer'
 						    ]) !!}
@@ -43,7 +32,7 @@
 
 						{{-- Odoslať odpoveď Submit --}}
 						<div class="form-group">
-						    {!! Form::submit('odoslať odpoveď', [
+						    {!! Form::submit('save subcontent', [
 						        'class' => 'btn btn-primary btn-block'
 						    ]) !!}
 						</div>

@@ -28,9 +28,32 @@
 
 						<strong>{{ $question->content }}</strong>
 
+						@if($question->hasSubcontent())
+							<hr>
+							<strong>Podrobné znenie:</strong>
+							<div class="row">
+								<div class="col-sm-12">
+									{!! $question->subcontent !!}
+								</div>
+							</div>
+							@if(Auth::user()->isAdmin())
+								<div class="btn-group">
+									<a href="{{ route('questions.edit.subcontent', $question->id) }}" class="btn btn-default btn-xs">edit subcontent</a>
+								</div>
+							@endif
+						@else
+							@if(Auth::user()->isAdmin())
+								<hr>
+								<div class="btn-group">
+									<a href="{{ route('questions.edit.subcontent', $question->id) }}" class="btn btn-default btn-xs">add subcontent</a>
+								</div>
+							@endif
+						@endif
+
 						<hr>
 						<div class="row">
 							<div class="col-sm-12">
+								<strong>Odpoveď:</strong>
 								{!!  $question->getAnswerText() !!}
 							</div>
 						</div>

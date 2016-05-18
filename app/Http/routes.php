@@ -32,6 +32,8 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::post('question/comment/{id}', ['as' => 'questions.comment', 'uses' => 'QuestionController@commentQuestion']);
 	Route::get('question/comment/delete/{id}', ['as' => 'questions.comment.delete', 'uses' => 'QuestionController@deleteComment']);
 	Route::get('question/update/{id}/{status}', ['as' => 'questions.update.status', 'uses' => 'QuestionController@updateQuestionStatus']);
+	Route::post('question/update/subcontent/{id}', ['as' => 'questions.update.subcontent', 'uses' => 'QuestionController@updateSubcontent']);
+	Route::get('question/edit/subcontent/{id}', ['as' => 'questions.edit.subcontent', 'uses' => 'QuestionController@editSubcontent']);
 	
 	Route::get('users', ['as' => 'users.index', 'uses' => 'UserController@indexUsers']);
 	Route::get('user/{id}', ['as' => 'users.show', 'uses' => 'UserController@showUser']);
