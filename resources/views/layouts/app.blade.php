@@ -62,7 +62,9 @@
 				<!-- Authentication Links -->
 				@if (Auth::guest())
 					<li><a href="{{ url('/login') }}">Login</a></li>
-					<li><a href="{{ url('/register') }}">Register</a></li>
+					@if(!env('DISABLE_REGISTRATIONS', true))
+						<li><a href="{{ url('/register') }}">Register</a></li>
+					@endif
 				@else
 
 					@if(Auth::user()->hasCategory(1))

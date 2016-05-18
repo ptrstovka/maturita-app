@@ -23,7 +23,8 @@ Route::get('user/activate/{token}', ['as' => 'user.activate', 'uses' => 'UserCon
 Route::post('user/create', ['as' => 'user.create', 'uses' => 'UserController@createUser']);
 
 Route::group(['middleware' => 'auth'], function() {
-	
+
+	Route::get('questions/download',['as' => 'questions.download', 'uses' => 'QuestionController@downloadQuestionFile']);
 	Route::get('questions/all/{category}', ['as' => 'questions.all', 'uses' => 'QuestionController@indexAll']);
 	Route::get('questions/user/{category}', ['as' => 'questions.user', 'uses' => 'QuestionController@userQuestions']);
 	Route::get('question/{id}', ['as' => 'questions.show', 'uses' => 'QuestionController@showQuestion']);

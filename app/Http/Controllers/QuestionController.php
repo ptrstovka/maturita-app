@@ -426,4 +426,14 @@ class QuestionController extends Controller
 			->withQuestion(Question::findOrFail($id));
 	}
 
+	public function downloadQuestionFile(){
+
+		if(!Auth::user()->isVerified()){
+			return Redirect::to('home')->withErrors(['Nemáš oprávnenie stiahnuť si súbor s otázkami.']);
+		}
+
+		return response()->download('downloads/'. env('QUESTION_FILE') .
+			'.' . env('QUESTION_FILE_EXTENSION'), "otazky_maturita." . env('QUESTION_FILE_EXTENSION'));
+	}
+	
 }
