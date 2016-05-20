@@ -117,10 +117,38 @@
 
 @yield('content')
 
+<a id="back-to-top" href="#" class="btn btn-primary btn-lg back-to-top" role="button" title="back to top" data-toggle="tooltip" data-placement="left"><span class="fa fa-arrow-up"></span></a>
+
 		<!-- JavaScripts -->
 @section('scripts')
 	<script src="{{ asset('js/jquery-2.1.1.js') }}"></script>
 	<script src="{{ asset('js/bootstrap.js') }}"></script>
+
+	<script type="text/javascript">
+
+		$(document).ready(function(){
+			$(window).scroll(function () {
+				if ($(this).scrollTop() > 50) {
+					$('#back-to-top').fadeIn();
+				} else {
+					$('#back-to-top').fadeOut();
+				}
+			});
+			// scroll body to 0px on click
+			$('#back-to-top').click(function () {
+				$('#back-to-top').tooltip('hide');
+				$('body,html').animate({
+					scrollTop: 0
+				}, 800);
+				return false;
+			});
+
+			$('#back-to-top').tooltip('show');
+
+		});
+
+	</script>
+
 @show
 </body>
 </html>
