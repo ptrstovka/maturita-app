@@ -32,7 +32,7 @@ class QuestionController extends Controller
 			return abort(404);
 		}
 
-		if (!$user->isVerified() && !$user->isAdmin()) {
+		if (!$user->isVerified() && !$user->isAdmin() && $user->role != 4) {
 			Session::flash('warning', 'Nemáš prístup ku všetkým otázkam lebo si nevypracoval dostatočný počet otázok. 
 		    Potrebuješ vypracovať aspoň 8 otázok. Ty si vypracoval ' . $user->solved_questions . '.');
 
@@ -67,7 +67,7 @@ class QuestionController extends Controller
 			return abort(404);
 		}
 
-		if (!Auth::user()->isVerified() && $question->assigned_to != Auth::user()->id && !Auth::user()->isAdmin()) {
+		if (Auth::user()->role != 4 && !Auth::user()->isVerified() && $question->assigned_to != Auth::user()->id && !Auth::user()->isAdmin()) {
 			return abort(404);
 		}
 

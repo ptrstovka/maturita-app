@@ -76,7 +76,7 @@
 							@endif
 
 							<div class="col-sm-12">
-								<p>Made with <i class="fa fa-heart-o"></i> by Petrík. <strong>v1.6</strong></p>
+								<p>Made with <i class="fa fa-heart-o"></i> by @ptrstovka. <strong>v2.0</strong></p>
 							</div>
 
 						</div>

@@ -8,7 +8,12 @@
 					<div class="panel-heading">Registrácia</div>
 					<div class="panel-body">
 
-						{!! Form::open(['route' => 'user.create', 'method' => 'post', 'class' => 'form-horizontal']) !!}
+
+						{!! Form::open(['route' => isset($user) ? 'user.invite.register' : 'user.create', 'method' => 'post', 'class' => 'form-horizontal']) !!}
+
+                        @if(isset($user))
+                        {!! Form::hidden('token', $user->invitation_token) !!}
+                        @endif
 
 						<div class="form-group{{ $errors->has('first_name') ? ' has-error' : '' }}">
 							{{--  Field --}}
@@ -44,9 +49,13 @@
 							{{--  Field --}}
 							{!! Form::label('email', 'Email:', ['class' => 'col-md-4 control-label']) !!}
 							<div class="col-md-6">
-								{!! Form::email('email', old('email'), [
-									'class' => 'form-control'
-								]) !!}
+								<?php
+									$attrs = ['class' => 'form-control'];
+									if (isset($user)) {
+										$attrs['disabled'] = '';
+									}
+								?>
+								{!! Form::email('email', old('email', isset($user) ? $user->email : ''), $attrs) !!}
 								@if ($errors->has('email'))
 									<span class="help-block">
                                         <strong>{{ $errors->first('email') }}</strong>
@@ -84,7 +93,6 @@
 								@endif
 							</div>
 						</div>
-
 
 						{{-- Registrovať Submit --}}
 						<div class="form-group">

@@ -101,7 +101,9 @@
 						<ul class="dropdown-menu" role="menu">
 							@if(Auth::user()->isAdmin())
 								<li><a href="{{ route('users.index') }}"><i class="fa fa-btn fa-users"></i>Users</a></li>
+								<li><a href="{{ route('users.invite.show') }}"><i class="fa fa-btn fa-envelope"></i>Invite user</a></li>
 							@endif
+								<li><a href="{{ route('users.password.show') }}"><i class="fa fa-btn fa-key"></i>Change password</a></li>
 							<li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
 						</ul>
 					</li>

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Mail;
 
@@ -17,7 +18,10 @@ class User extends Authenticatable
 		'last_name',
 		'email',
 		'password',
-		'token'
+		'token',
+        'invitation_token',
+        'invitation_expires_at',
+        'role',
 	];
 
 	/**
@@ -33,6 +37,10 @@ class User extends Authenticatable
 	protected $casts = [
 		'is_activated' => 'boolean'
 	];
+
+    protected $dates = [
+        'invitation_expires_at'
+    ];
 	
 	protected $appends = ['questions'];
 
@@ -90,5 +98,30 @@ class User extends Authenticatable
 		
 		return false;
 	}
+
+	// invitation email užvateľovi
+    public function sendInvitationMail()
+    {
+        $mailData = [
+            'to'       => $this->email,
+            'from'     => 'noreply@jasompeter.com',
+            'nameFrom' => 'Peter Štovka'
+        ];
+
+
+        Mail::send('email.invite', ['token' => $this->invitation_token], function ($message) use ($mailData) {
+            $message->to($mailData['to'], 'Pozvánka')
+                ->subject('Pozvánka')
+                ->from($mailData['from'], $mailData['nameFrom']);
+        });
+    }
+
+    public function isInvitationValid() {
+        if ($this->invitation_expires_at == null) {
+            return false;
+        }
+
+        return $this->invitation_expires_at->gt(Carbon::now());
+    }
 	
 }

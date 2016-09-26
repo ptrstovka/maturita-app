@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -170,5 +171,120 @@ class UserController extends Controller
 
 		return back();
 	}
+
+	public function acceptInvitation($token) {
+	    $user = User::where('invitation_token', $token)->first();
+        if ($user == null) {
+            Session::flash('warning', 'Neplatný token pozvánky.');
+            return Redirect::to('/');
+        }
+
+        if (!$user->isInvitationValid()) {
+            Session::flash('warning', 'Platnosť pozvánky vypršala.');
+            return Redirect::to('/');
+        }
+
+        return view('auth.register')
+            ->withUser($user);
+    }
+
+    public function registerInvitedUser(Request $request) {
+        $data = $request->only(['token', 'first_name', 'last_name', 'password', 'password_confirmation']);
+        $validator = Validator::make($data, [
+            'token' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'password' => 'required|confirmed|min:8'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withInput($data)->withErrors($validator->errors());
+        }
+
+        $user = User::where('invitation_token', $data['token'])->first();
+
+        if ($user == null) {
+            Session::flash('warning', 'Neplatný token.');
+            return Redirect::to('/');
+        }
+
+        if (!$user->isInvitationValid()) {
+            Session::flash('warning', 'Platnosť pozvánky vypršala.');
+            return Redirect::to('/');
+        }
+
+        $user->activate();
+        $user->invitation_token = null;
+        $user->first_name = $data['first_name'];
+        $user->last_name = $data['last_name'];
+        $user->password = bcrypt($data['password']);
+        $user->save();
+
+        Session::flash('message', 'Účet bol vytvorený, môžeš sa prihlásiť.');
+        return Redirect::to('/');
+    }
+
+    // odosle pozvanku uzivatelovi
+    public function sendInvitation(Request $request) {
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+            return;
+        }
+
+        $data = $request->only(['email']);
+        $validator = Validator::make($data, [
+           'email' => 'required|unique:users,email|email'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withInput($data)->withErrors($validator->errors());
+        }
+
+        $user = User::create([
+            'email' => $data['email'],
+            'is_activated' => false,
+            'role' => 4,
+            'invitation_token' => strtolower(str_random(64)),
+            'invitation_expires_at' => Carbon::now()->addHours(24),
+        ]);
+
+        $user->sendInvitationMail();
+        Session::flash('message', 'Invitation email to ' . $data['email'] . ' has been successfully sent!');
+        return back();
+    }
+
+    // zobrazi invite page iba adminovi
+    public function showInvitePage() {
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+            return;
+        }
+        return view('users.invite');
+    }
+
+    // zobrazi page na zmenu hesla
+    public function showPasswordChangePage() {
+        return view('users.password');
+    }
+
+    // zmeni heslo
+    public function changePassword(Request $request) {
+
+        $data = $request->only(['password', 'password_confirmation']);
+        $validator = Validator::make($data, [
+           'password' => 'required|min:8|confirmed'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withInput($data)->withErrors($validator->errors());
+        }
+
+        $user = Auth::user();
+        $user->password = bcrypt($data['password']);
+        $user->save();
+
+        Session::flash('message', 'Heslo zmenené.');
+        return back();
+    }
 
 }

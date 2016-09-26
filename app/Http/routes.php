@@ -20,7 +20,9 @@ Route::auth();
 Route::get('/home', ['as' => 'home', 'uses' => 'HomeController@index']);
 
 Route::get('user/activate/{token}', ['as' => 'user.activate', 'uses' => 'UserController@activateAccount']);
+Route::get('user/invite/accept/{token}', ['as' => 'user.invite', 'uses' => 'UserController@acceptInvitation']);
 Route::post('user/create', ['as' => 'user.create', 'uses' => 'UserController@createUser']);
+Route::post('user/invite/register', ['as' => 'user.invite.register', 'uses' => 'UserController@registerInvitedUser']);
 
 Route::group(['middleware' => 'auth'], function() {
 
@@ -39,5 +41,9 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::get('users', ['as' => 'users.index', 'uses' => 'UserController@indexUsers']);
 	Route::get('user/{id}', ['as' => 'users.show', 'uses' => 'UserController@showUser']);
 	Route::post('user/update/{id}', ['as' => 'users.update', 'uses' => 'UserController@updateUser']);
+    Route::get('user/invite/email', ['as' => 'users.invite.show', 'uses' => 'UserController@showInvitePage']);
+    Route::post('user/invite/email', ['as' => 'users.invite', 'uses' => 'UserController@sendInvitation']);
+    Route::get('user/password/change', ['as' => 'users.password.show', 'uses' => 'UserController@showPasswordChangePage']);
+    Route::post('user/password', ['as' => 'users.password', 'uses' => 'UserController@changePassword']);
 	
 });
